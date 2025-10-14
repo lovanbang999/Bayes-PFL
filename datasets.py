@@ -216,7 +216,10 @@ class MyDataset(data.Dataset):
 
 
 	def combine_img(self, cls_name):   # From APRIL-GAN: https://github.com/ByChelsea/VAND-APRIL-GAN
-		img_paths = os.path.join(self.root, "mvtec",cls_name, 'test')
+		if self.dataset == "mvtec":
+			img_paths = os.path.join(self.root, "mvtec", cls_name, 'test')
+		else:
+			img_paths = os.path.join(self.root, "visa", cls_name, 'test')
 		img_ls = []
 		mask_ls = []
 		for i in range(4):
@@ -226,7 +229,25 @@ class MyDataset(data.Dataset):
 			files = os.listdir(os.path.join(img_paths, random_defect))
 			random_file = random.choice(files)
 			img_path = os.path.join(img_paths, random_defect, random_file)
-			mask_path = os.path.join(self.root, "mvtec",cls_name, 'ground_truth', random_defect, random_file.replace("bmp", "png"))
+			mask_path = os.path.join(
+					self.root,
+					self.dataset,
+					cls_name,
+					'ground_truth',
+					random_defect,
+					random_file.replace(".bmp", ".png")
+			)
+
+			if not os.path.exists(mask_path):
+					# Nếu không có file .png, thử giữ nguyên .bmp
+					mask_path = os.path.join(
+							self.root,
+							self.dataset,
+							cls_name,
+							'ground_truth',
+							random_defect,
+							random_file
+					)
 			assert (os.path.exists(img_path))
 			img = Image.open(img_path)
 			img_ls.append(img)

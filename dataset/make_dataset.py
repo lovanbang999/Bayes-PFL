@@ -17,11 +17,6 @@ from datasets.ColonDB import ColonDB_dataset
 from datasets.Endo import Endo_dataset
 from datasets.Kvasir import Kvasir_dataset
 
-
-
-
-
-
 def move(path):
     if os.path.exists(path):
         shutil.rmtree(path)
@@ -141,5 +136,29 @@ if __name__ == "__main__":
             id_start= 0
         )
         print(f"Finished {config['name']}, next ID: {id_counter}")
+
+    # ===== MAPREDUCE PROCESSING =====
+    print("\n" + "="*80)
+    print("STARTING MAPREDUCE DATA PROCESSING")
+    print("="*80)
+    
+    for config in datasets_config:
+        dataset_name = config['name']
+        dataset_root = config['des']
+        meta_path = f"./dataset/mvisa/data/meta_{dataset_name}.json"
+        
+        if os.path.exists(meta_path):
+            print(f"\n{'='*80}")
+            print(f"MapReduce processing: {dataset_name}")
+            print(f"{'='*80}")
+            
+            stats = process_single_dataset(
+                dataset_name=dataset_name,
+                dataset_root=dataset_root,
+                meta_path=meta_path,
+                num_workers=8  # Có thể điều chỉnh
+            )
+        else:
+            print(f"⚠️  Skipping {dataset_name}: metadata not found")
 
     
